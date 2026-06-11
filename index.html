@@ -3,100 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robiul IPTV Clone</title>
+    <title>Live TV App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body {
-            background-color: #12141c;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-        .header-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            padding: 15px;
-            background: #1a1d29;
-            border-bottom: 1px solid #2a2e3f;
-        }
-        video {
-            width: 100%;
-            max-height: 250px;
-            background: black;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-        .category-scroll {
-            display: flex;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 10px 15px;
-            gap: 10px;
-        }
-        .category-btn {
-            background: #222634;
-            color: #b5b9c4;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        .category-btn.active {
-            background: #e50914;
-            color: white;
-        }
-        .channel-list {
-            padding: 15px;
-        }
-        .channel-card {
-            background: #1c1f2e;
-            border: 1px solid #2a2e3f;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .channel-card:active {
-            background: #2a2e3f;
-        }
-        .channel-logo {
-            width: 50px;
-            height: 50px;
-            background: #2a2e3f;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-right: 15px;
-            overflow: hidden;
-        }
-        .channel-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .channel-info h5 {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        .channel-info p {
-            margin: 0;
-            font-size: 0.8rem;
-            color: #8a8f9e;
-        }
+        body { background-color: #12141c; color: white; font-family: Arial, sans-serif; }
+        .header-title { font-size: 1.2rem; font-weight: bold; padding: 15px; background: #1a1d29; border-bottom: 1px solid #2a2e3f; }
+        video { width: 100%; max-height: 250px; background: black; position: sticky; top: 0; z-index: 999; }
+        .category-scroll { display: flex; overflow-x: auto; white-space: nowrap; padding: 10px 15px; gap: 10px; }
+        .category-btn { background: #222634; color: #b5b9c4; border: none; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; }
+        .category-btn.active { background: #e50914; color: white; }
+        .channel-list { padding: 15px; }
+        .channel-card { background: #1c1f2e; border: 1px solid #2a2e3f; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; }
+        .channel-logo { width: 50px; height: 50px; background: #2a2e3f; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; margin-right: 15px; }
+        .channel-info h5 { margin: 0; font-size: 1rem; font-weight: 600; }
+        .channel-info p { margin: 0; font-size: 0.8rem; color: #8a8f9e; }
     </style>
 </head>
 <body>
 
     <video id="video" controls autoplay></video>
-
     <div class="header-title">লাইভ টিভি অ্যাপ</div>
 
     <div class="category-scroll">
@@ -106,9 +32,63 @@
         <button class="category-btn" onclick="filterCategory('Indian')">Indian</button>
     </div>
 
-    <div class="channel-list" id="channelContainer">
-        </div>
+    <div class="channel-list" id="channelContainer"></div>
 
-    <script src="app.js"></script>
+    <script>
+        // জাভাস্ক্রিপ্ট কোডও এখন এই এক ফাইলের ভেতরেই দিয়ে দিলাম
+        const channels = [
+            { name: "Al Jazeera English (১০০% চলবে)", category: "Bangla", logo: "AJ Live", url: "https://live-alsat.secure.footprint.net/atv/index.m3u8" },
+            { name: "TRT World News (১০০% চলবে)", category: "Sports", logo: "TRT Live", url: "https://trtworld.daastreaming.com/live.m3u8" },
+            { name: "NASA TV Space (১০০% চলবে)", category: "Indian", logo: "NASA", url: "https://ntvlive-lh.akamaihd.net/i/NASA_1@301454/master.m3u8" },
+            { name: "T Sports Live", category: "Sports", logo: "T Sports", url: "https://bdiptv.stream:8081/tsports/index.m3u8" },
+            { name: "Gazi TV (GTV Live)", category: "Sports", logo: "GTV", url: "https://bdiptv.stream:8081/gtv/index.m3u8" },
+            { name: "Star Jalsha", category: "Indian", logo: "Jalsha", url: "https://bdiptv.stream:8081/starjalsha/index.m3u8" },
+            { name: "Zee Bangla", category: "Indian", logo: "Zee", url: "https://bdiptv.stream:8081/zeebangla/index.m3u8" }
+        ];
+
+        const video = document.getElementById('video');
+        const container = document.getElementById('channelContainer');
+
+        function displayChannels(filter) {
+            if (!container) return;
+            container.innerHTML = "";
+            channels.forEach(channel => {
+                if (filter === 'All' || channel.category === filter) {
+                    const card = document.createElement('div');
+                    card.className = 'channel-card';
+                    card.onclick = function() { playM3U8(channel.url); };
+                    card.innerHTML = `
+                        <div class="channel-logo">${channel.logo}</div>
+                        <div class="channel-info">
+                            <h5>${channel.name}</h5>
+                            <p>${channel.category}</p>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        function filterCategory(categoryName) {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if(event && event.target) { event.target.classList.add('active'); }
+            displayChannels(categoryName);
+        }
+
+        function playM3U8(url) {
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play(); });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => video.play());
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => displayChannels('All'));
+    </script>
 </body>
 </html>
